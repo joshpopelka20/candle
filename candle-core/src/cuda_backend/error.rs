@@ -47,6 +47,7 @@ pub enum CudaError {
 
 impl From<CudaError> for crate::Error {
     fn from(val: CudaError) -> Self {
+        println!("CUDA driver error occurred: {:?}", val);
         crate::Error::Cuda(Box::new(val)).bt()
     }
 }
