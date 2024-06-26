@@ -11,8 +11,8 @@
 //! use candle_nn::{LayerNorm, Module};
 //! # fn main() -> candle::Result<()> {
 //!
-//! let w = Tensor::new(1f32, &Cpu)?;
-//! let b = Tensor::new(0f32, &Cpu)?;
+//! let w = Tensor::new(&[1f32, 1f32, 1f32], &Cpu)?;
+//! let b = Tensor::new(&[0f32, 0f32, 0f32], &Cpu)?;
 //! let layer = LayerNorm::new(w, b, 1e-5);
 //!
 //! let xs = Tensor::new(
@@ -130,6 +130,9 @@ impl LayerNorm {
 
 impl Module for LayerNorm {
     fn forward(&self, x: &Tensor) -> Result<Tensor> {
+        if x.is_contiguous() && self.remove_mean {
+            return crate::ops::layer_norm(x, &self.weight, &self.bias, self.eps as f32);
+        }
         let x_dtype = x.dtype();
         let internal_dtype = match x_dtype {
             DType::F16 | DType::BF16 => DType::F32,
@@ -291,18 +294,7 @@ impl<T> RmsNorm<T> {
 
 impl Module for RmsNorm<RmsNormNonQuantized> {
     fn forward(&self, xs: &Tensor) -> Result<Tensor> {
-        #[cfg(feature = "cuda")]
-        {
-            let (bs, s, h) = xs.dims3()?;
-            let xs = xs.reshape((bs * s, h))?;
-            let res =
-                candle_layer_norm::rms_norm(&xs, self.inner.weight(), None, self.inner.eps as f32)?;
-            res.reshape((bs, s, h))
-        }
-        #[cfg(not(feature = "cuda"))]
-        {
-            self.inner.forward(xs)
-        }
+        self.inner.forward(xs)
     }
 }
 
