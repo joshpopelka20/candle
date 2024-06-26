@@ -128,6 +128,7 @@ impl<S: NdArray> NdArray for Vec<S> {
 impl Device {
     pub fn new_cuda(ordinal: usize) -> Result<Self> {
         let bob = crate::CudaDevice::new(ordinal);
+        println!("line 131 device.rs");
         println!("{:?}  ", bob);
         Ok(Self::Cuda(crate::CudaDevice::new(ordinal)?))
     }
