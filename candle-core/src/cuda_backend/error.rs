@@ -3,7 +3,7 @@ use crate::{DType, Layout};
 /// cudarc related errors
 #[derive(thiserror::Error, Debug)]
 pub enum CudaError {
-    #[error(transparent)]
+    #[error("CUDA driver error occurred: {0}")]
     Cuda(#[from] cudarc::driver::DriverError),
 
     #[error(transparent)]
