@@ -52,7 +52,7 @@ impl AsRef<Tensor> for Tensor {
 // Tensors are refcounted so that cloning is cheap when building the op graph.
 // Storages are also refcounted independently so that its possible to avoid
 // copying the storage for operations that only modify the shape or stride.
-#[derive(Copy, Clone)]
+#[derive(Clone)]
 /// The core struct for manipulating tensors.
 ///
 /// ```rust
