@@ -20,6 +20,7 @@ impl TensorId {
     }
 }
 
+#[derive(Copy, Clone)]
 pub struct Tensor_ {
     id: TensorId,
     // As we provide inner mutability on the tensor content, the alternatives are:
